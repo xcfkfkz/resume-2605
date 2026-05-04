@@ -40,23 +40,27 @@ export default defineConfig({
 											caches.open(CACHE_NAME_AUTH).then(async cache => {
 												try {
 													const data = await response.clone().json() as { token: string };
-													await cache.put(
-														new Request(FAKE_REQUEST_KEY, {
-															method: 'GET',
-														}),
-														new Response(
-															JSON.stringify({
-																token: data.token,
-																timestamp: Date.now(),
+													if (data.token) {
+														await cache.put(
+															new Request(FAKE_REQUEST_KEY, {
+																method: 'GET',
 															}),
-															{
-																headers: { 'Content-Type': 'application/json' },
-															},
-														),
-													);
+															new Response(
+																JSON.stringify({
+																	token: data.token,
+																	timestamp: Date.now(),
+																}),
+																{
+																	headers: { 'Content-Type': 'application/json' },
+																},
+															),
+														);
+														resolve(response);
+													} else {
+														resolve(response);
+													}
+												} catch {
 													resolve(response);
-												} catch (e) {
-													console.error('Cache put error:', e);
 												}
 											});
 										});
@@ -75,7 +79,7 @@ export default defineConfig({
 												if (cached) {
 													const { token } = await cached.json() as { token: string };
 													const headers = new Headers(request.headers);
-													headers.append('Authorization', `Bearer ${token}`);
+													headers.set('Authorization', `Bearer ${token}`);
 													resolve(
 														new Request(request, {
 															headers,

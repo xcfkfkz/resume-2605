@@ -1,5 +1,4 @@
-
-export default function setTimeout2(handler: () => void, timeout: number = 0) {
+export default function setTimeoutRaf(handler: () => void, timeout: number = 0) {
 	const start = performance.now()
 	let canceled = false
 	function loop() {
