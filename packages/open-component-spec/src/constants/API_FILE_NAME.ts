@@ -1,0 +1,1 @@
+export default 'index.zh-CN.md'
